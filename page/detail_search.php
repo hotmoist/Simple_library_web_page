@@ -6,6 +6,7 @@
     $publisher = $_POST['publisher'];
     $min_year = $_POST['min_year'];
     $max_year = $_POST['max_year'];
+    $count = 0;
 ?>
 
 <!DOCTYPE html>
@@ -81,6 +82,7 @@
 
                         $stmt -> execute(array($book_name, $author, $publisher, $min_year, $max_year));
                         while($row = $stmt -> fetch(PDO::FETCH_ASSOC)){
+                            $count += 1;
                     ?>
                     <tr>
                         <td><?= $row['TITLE'] ?></td>
@@ -94,6 +96,7 @@
                     ?>
                 </tbody>
             </table>
+            <p>검색결과 : <?=$count?>건</p>
         </div>
     </p>
 </body>
