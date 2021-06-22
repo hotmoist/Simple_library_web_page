@@ -1,6 +1,11 @@
 <?php
     include "db_conn.php";
-    include "main.php"
+    include "main.php";
+    $book_name = $_POST['book_name'];
+    $author = $_POST['author'];
+    $publisher = $_POST['publisher'];
+    $min_year = $_POST['min_year'];
+    $max_year = $_POST['max_year'];
 ?>
 
 <!DOCTYPE html>
@@ -16,7 +21,7 @@
         <h1>상세검색</h1>
         <p>홈 > 도서검색 > 상세검색</p>
         <p>검색조건</p>
-        <form action="">
+        <form method="post">
             <p>
                 <label for="book_name_txt">도서명 : </label> 
                 <input id="book_name_txt" type="text" name="book_name">
@@ -30,16 +35,66 @@
                 <input id="publisher_txt" type="text" name="publisher">
             </p>
             <p>
-                <label for="publish_year_1_txt">발행연도</label>
-                <input id="publish_year_1_txt" type="text" name="publish_year_1">
+                <label for="min_year_txt">발행연도(YYYY~YYYY)</label>
+                <input id="min_year_txt" type="text" name="min_year">
                 ~
-                <input id="publish_year_2_txt" type="text" name="publish_year_2">
+                <input id="max_year_txt" type="text" name="max_year">
             </p>
             <p>
-                <button onclick="" type="submit" name="search" title="검색">검색</button>
+                <button type="submit" name="search" title="검색">검색</button>
             </p>
         </form>
+        <hr>
 
+        <div class="container">
+            <h2 class="text-center">검색 결과</h2>
+            <table class="table table-bordered text-center">
+                <thead>
+                    <th>제목</th>
+                    <th>저자</th>
+                    <th>출판사</th>
+                    <th>연도</th>
+                </thead>
+                <tbody>
+                    <?php
+                    $stmt = $conn -> prepare("SELECT E.TITLE, A.AUTHOR, E.PUBLISHER, EXTRACT(YEAR FROM CAST (E.YEAR AS DATE)) AS YEAR  
+                    FROM  EBOOK E, AUTHORS A
+                    WHERE E.ISBN = A.ISBN
+                    AND LOWER(E.TITLE) LIKE '%' || LOWER(:book_name) || '%'
+                    AND LOWER(A.AUTHOR) LIKE '%' || LOWER(:author) || '%'
+                    AND LOWER(E.PUBLISHER) LIKE '%' || LOWER (:publisher) || '%'
+                    AND YEAR BETWEEN TO_DATE(:min_year) AND TO_DATE(:max_year)
+                    ORDER BY E.ISBN
+                    ");
+
+                    if($min_year != ''){
+                        $min_year = $min_year."-01-01";
+                    }
+                    if($max_year != ''){
+                        $max_year = $max_year."-12-31";
+                    }
+           
+                     if(array_key_exists('search', $_POST) && ($book_name == '' || $author == '' 
+                     || $publisher =='' || $min_year =='' || $max_year =='')){
+                         echo "<script>alert('검색 정보가 부족합니다.');</script>";
+                     }else{
+
+                        $stmt -> execute(array($book_name, $author, $publisher, $min_year, $max_year));
+                        while($row = $stmt -> fetch(PDO::FETCH_ASSOC)){
+                    ?>
+                    <tr>
+                        <td><?= $row['TITLE'] ?></td>
+                        <td><?= $row['AUTHOR'] ?></td>
+                        <td><?= $row['PUBLISHER'] ?></td>
+                        <td><?= $row['YEAR']?></td>
+                    </tr>
+                    <?php    
+                        }        
+                    }            
+                    ?>
+                </tbody>
+            </table>
+        </div>
     </p>
 </body>
 </html>
