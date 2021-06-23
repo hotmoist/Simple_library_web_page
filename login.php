@@ -20,6 +20,7 @@
             $_SESSION['id'] = $member[0]['EMAIL'];
             $_SESSION['pwd'] = $member[0]['PASSWD'];
             $_SESSION['name'] = $member[0]['NAME'];
+            $_SESSION['cno'] = $member[0]['CNO'];
             echo "<script>alert('로그인되었습니다.'); location.href='/page/home.php';</script>";
         }else{ // 비밀번호가 같지 않다면 알림창을 띄우고 전 페이지로 돌아갑니다
             echo "<script>alert('아이디 혹은 비밀번호를 확인하세요.'); history.back();</script>";

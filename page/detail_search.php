@@ -85,18 +85,18 @@
                             $count += 1;
                     ?>
                     <tr>
-                        <td><?= $row['TITLE'] ?></td>
+                        <td><a href="book_detail.php?title=<?= $row['TITLE']?>"><?= $row['TITLE'] ?></td>
                         <td><?= $row['AUTHOR'] ?></td>
                         <td><?= $row['PUBLISHER'] ?></td>
                         <td><?= $row['YEAR']?></td>
                     </tr>
                     <?php    
                         }        
-                    }            
+                    }
+                    echo "검색결과 : $count 건";            
                     ?>
                 </tbody>
             </table>
-            <p>검색결과 : <?=$count?>건</p>
         </div>
     </p>
 </body>

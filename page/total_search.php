@@ -37,8 +37,7 @@
                 </thead>
             <tbody>
                 <?php
-            
-            $stmt = $conn -> prepare("SELECT E.TITLE, A.AUTHOR, E.PUBLISHER, EXTRACT(YEAR FROM CAST (E.YEAR AS DATE)) AS YEAR  
+                $stmt = $conn -> prepare("SELECT E.TITLE, A.AUTHOR, E.PUBLISHER, EXTRACT(YEAR FROM CAST (E.YEAR AS DATE)) AS YEAR  
                 FROM  EBOOK E, AUTHORS A
                 WHERE E.ISBN = A.ISBN
                 AND (LOWER(E.TITLE) LIKE '%' || LOWER(:searchWord) || '%'
@@ -68,10 +67,10 @@
                         //    print("none");
                         //}
                     }
+                    echo "검색 결과 : $count 건";
                     ?>
                 </tbody>
             </table>
-            <p>검색 결과 : <?= $count?> 건</p>
         </div>
         </p>
     </body>

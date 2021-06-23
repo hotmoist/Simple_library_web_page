@@ -1,6 +1,9 @@
 <?php
+    session_start();
     include "db_conn.php";
-    include "main.php"
+    include "main.php";
+    $count = 0;
+    $cno = $_SESSION['cno'];
 ?>
 
 <!DOCTYPE html>
@@ -15,10 +18,44 @@
     <p>
         <h1>예약조회</h1>
         <P>홈 > 도서이용 > 예약조회</P>
-        현재 계정에서 예약된 책들 조회
-        <p>
-            <button type="submit">예약취소</button>
-        </p>
+        <!-- 현재 계정에서 예약된 책들 조회 -->
+        <div class="container">
+            <table class="table table-bordered text-center">
+                <thead>
+                    <th>제목</th>
+                    <th>저자</th>
+                    <th>출판사</th>
+                    <th>예약 일자</th>
+                </thead>
+                <tbody>
+                <?php
+                    $stmt = $conn -> prepare(" SELECT E.TITLE, A.AUTHOR, E.PUBLISHER, R.DATETIME
+                    FROM EBOOK E, AUTHORS A, RESERVE R
+                    WHERE E.ISBN = A.ISBN
+                    AND A.ISBN = R.ISBN
+                    AND R.CNO = :cno
+                    ");
+                    $stmt -> execute(array($cno));
+                    while ($row = $stmt -> fetch(PDO::FETCH_ASSOC)){
+                        $count = $count + 1;
+                ?>
+                    <tr>
+                        <td><?=$row['TITLE']?></td>
+                        <td><?=$row['AUTHOR']?></td>
+                        <td><?=$row['PUBLISHER']?></td>
+                        <td><?=$row['DATETIME']?></td>
+                    </tr>
+                <?php
+                    }
+                    echo "예약 건수 : $count 건"                   
+                ?>
+                </tbody>
+            </table>
+            <p>
+                <!-- 예약 취소 구현 -->
+                <button type="submit">예약취소</button>
+            </p>
+        </div>
     </p>
     
 </body>

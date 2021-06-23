@@ -60,14 +60,15 @@
             $stmt -> execute(array($title));
             if($row = $stmt -> fetch(PDO::FETCH_ASSOC)){
             ?> 
-            이미 대출 중인 도서입니다.
+            <p>이미 대출 중인 도서입니다.</p>
+            <!-- 예약 기능 구현 -->
             <?php 
             }else {
             ?>
         
-        <form name="loan_form" method="POST" action="../loanable.php">
-        <input type="hidden" name = "title" value="<?$book_title?>"> 
-        <button name="loan" id="loan" type="submit">대출</button>
+            <form name="loan_form" method="POST" action="../loanable.php">
+            <input type="hidden" name = "title" value="<?=$book_title?>"> 
+            <button name="loan" id="loan" type="submit">대출</button>
            <?php 
             }
             ?>
