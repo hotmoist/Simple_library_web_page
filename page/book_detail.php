@@ -1,4 +1,5 @@
 <?php
+    session_start();
     include "db_conn.php";
     include "main.php"; 
     $stmt = $conn -> prepare("SELECT E.TITLE, A.AUTHOR, E.PUBLISHER, EXTRACT(YEAR FROM CAST (E.YEAR AS DATE)) AS YEAR  
@@ -6,6 +7,7 @@
     WHERE E.ISBN = A.ISBN
     AND E.TITLE = :title
     ");
+    $cno = $_SESSION['cno'];
     $title = $_GET['title'];
     $stmt -> execute(array($title));
     $author = '';
@@ -53,15 +55,19 @@
         <p>
             <!-- 대출 가능 여부 구현 -->
             <?php
-            $stmt = $conn -> prepare("SELECT TITLE, DATERENTED
+            $stmt = $conn -> prepare("SELECT ISBN, TITLE, DATERENTED
             FROM EBOOK
             WHERE TITLE = :title
             AND DATERENTED IS NOT NULL");
             $stmt -> execute(array($title));
             if($row = $stmt -> fetch(PDO::FETCH_ASSOC)){
-            ?> 
-            <p>이미 대출 중인 도서입니다.</p>
+                ?> 
+            <p>대출된 도서입니다. * 본인이 이미 예약한 도서인 경우 구현 필요</p>
             <!-- 예약 기능 구현 -->
+            <form nam="reserve_form" method="POST" action="../reserve.php">
+            <input type='hidden' name= "isbn" value="<?=$row['ISBN']?>">
+            <button name='reserve' id='reserve' type='submit'>예약</button>
+            </form>
             <?php 
             }else {
             ?>

@@ -20,6 +20,7 @@
         <P>홈 > 도서이용 > 예약조회</P>
         <!-- 현재 계정에서 예약된 책들 조회 -->
         <div class="container">
+        <form method="POST" action="../rCancel.php" name="reserve_form">
             <table class="table table-bordered text-center">
                 <thead>
                     <th>제목</th>
@@ -29,7 +30,7 @@
                 </thead>
                 <tbody>
                 <?php
-                    $stmt = $conn -> prepare(" SELECT E.TITLE, A.AUTHOR, E.PUBLISHER, R.DATETIME
+                    $stmt = $conn -> prepare(" SELECT A.ISBN, R.CNO, E.TITLE, A.AUTHOR, E.PUBLISHER, R.DATETIME
                     FROM EBOOK E, AUTHORS A, RESERVE R
                     WHERE E.ISBN = A.ISBN
                     AND A.ISBN = R.ISBN
@@ -38,23 +39,24 @@
                     $stmt -> execute(array($cno));
                     while ($row = $stmt -> fetch(PDO::FETCH_ASSOC)){
                         $count = $count + 1;
-                ?>
+                        ?>
                     <tr>
-                        <td><?=$row['TITLE']?></td>
-                        <td><?=$row['AUTHOR']?></td>
+                        <td><input type ='radio' name ='isbn' value=<?=$row['ISBN']?>><?=$row['TITLE']?></td>
+                        <td><input type='hidden' name='cno' value=<?=$cno?>><?=$row['AUTHOR']?></td>
                         <td><?=$row['PUBLISHER']?></td>
                         <td><?=$row['DATETIME']?></td>
                     </tr>
                 <?php
                     }
                     echo "예약 건수 : $count 건"                   
-                ?>
+                    ?>
                 </tbody>
             </table>
             <p>
                 <!-- 예약 취소 구현 -->
                 <button type="submit">예약취소</button>
             </p>
+        </form>
         </div>
     </p>
     

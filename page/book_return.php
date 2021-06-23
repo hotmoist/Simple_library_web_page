@@ -23,6 +23,7 @@
         <p>
             <!-- 도서 반납 할 내역들 출력 -->
             <div class="container">
+                <form method="POST" action="../return.php" name="return_form">
                 <table class="table table-bordered text-center">
                     <thead>
                         <th>제목</th>
@@ -33,7 +34,7 @@
                     </thead>
                     <tbody>
                     <?php
-                        $stmt = $conn -> prepare("SELECT E.TITLE, A.AUTHOR, E.PUBLISHER, E.DATERENTED, E.DATEDUE
+                        $stmt = $conn -> prepare("SELECT E.ISBN, E.TITLE, A.AUTHOR, E.PUBLISHER, E.DATERENTED, E.DATEDUE
                         FROM EBOOK E, AUTHORS A
                         WHERE E.ISBN = A.ISBN
                         AND E.CNO = :cno
@@ -41,9 +42,9 @@
                         $stmt -> execute(array($cno));
                         while($row = $stmt -> fetch(PDO::FETCH_ASSOC)){
                             $count = $count + 1;
-                    ?>
+                            ?>
                         <tr>
-                            <td><?=$row['TITLE'] ?></td>
+                            <td><input type =radio name ='isbn' value=<?=$row['ISBN']?>><?=$row['TITLE'] ?></td>
                             <td><?=$row['AUTHOR'] ?></td>
                             <td><?=$row['PUBLISHER'] ?></td>
                             <td><?=$row['DATERENTED'] ?></td>
@@ -52,12 +53,13 @@
                     <?php
                         }
                         echo "대출 건수 : $count 건";
-                    ?>
+                        ?>
                     </tbody>
                 </table>
                 <p>
                     <button type="submit">도서반납</button>
                 </p>
+                </form>
             </div>
         </p>
     </p>

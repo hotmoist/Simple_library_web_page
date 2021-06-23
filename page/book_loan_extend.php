@@ -31,7 +31,7 @@
                 </thead>
                 <tbody>
                 <?php
-                    $stmt = $conn -> prepare("SELECT E.TITLE, A.AUTHOR, E.PUBLISHER, E.DATERENTED, E.DATEDUE
+                    $stmt = $conn -> prepare("SELECT E.ISBN, E.TITLE, A.AUTHOR, E.PUBLISHER, E.DATERENTED, E.DATEDUE
                     FROM EBOOK E, AUTHORS A
                     WHERE E.ISBN = A.ISBN
                     AND E.CNO = :cno
@@ -41,7 +41,7 @@
                         $count = $count + 1;
                 ?>
                     <tr>
-                        <td><?=$row['TITLE'] ?></td>
+                        <td><input type =radio name ='isbn' value=<?=$row['ISBN']?>><?=$row['TITLE'] ?></td>
                         <td><?=$row['AUTHOR'] ?></td>
                         <td><?=$row['PUBLISHER'] ?></td>
                         <td><?=$row['DATERENTED'] ?></td>
