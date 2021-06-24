@@ -20,6 +20,7 @@
         <p>홈 > 도서이용 > 도서대출/연장</p>
         <!-- 도서 대출 현황 정보 출력 -->
         <div class ="container">
+        <form method="POST" action="../extend.php" name="extend_form">
             <table class="table table-bordered text-center">
                 <thead>
                     <th>제목</th>
@@ -31,7 +32,7 @@
                 </thead>
                 <tbody>
                 <?php
-                    $stmt = $conn -> prepare("SELECT E.ISBN, E.TITLE, A.AUTHOR, E.PUBLISHER, E.DATERENTED, E.DATEDUE
+                    $stmt = $conn -> prepare("SELECT E.ISBN, E.TITLE, A.AUTHOR, E.PUBLISHER, E.DATERENTED, E.DATEDUE, E.EXTTIMES
                     FROM EBOOK E, AUTHORS A
                     WHERE E.ISBN = A.ISBN
                     AND E.CNO = :cno
@@ -47,7 +48,7 @@
                         <td><?=$row['DATERENTED'] ?></td>
                         <td><?=$row['DATEDUE'] ?></td>
                         <?php
-                        if($row['EXITTIMES'] == ''){
+                        if($row['EXTTIMES'] == ''){
                             ?>
                             <td>0</td>
                             <?php
@@ -68,6 +69,7 @@
             <!-- 대출 연장 구현 -->
                 <button type="submit">대출연장</button>
             </p>
+        </form>
         </div>
     </p>
 </body>

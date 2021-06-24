@@ -62,7 +62,7 @@
             $stmt -> execute(array($title));
             if($row = $stmt -> fetch(PDO::FETCH_ASSOC)){
                 ?> 
-            <p>대출된 도서입니다. * 본인이 이미 예약한 도서인 경우 구현 필요</p>
+            <p>대출된 도서입니다.</p>
             <!-- 예약 기능 구현 -->
             <form nam="reserve_form" method="POST" action="../reserve.php">
             <input type='hidden' name= "isbn" value="<?=$row['ISBN']?>">
