@@ -45,29 +45,45 @@
              echo "<script>alert('이미 예약 중인 도서입니다.'); history.back();</script>";
          }
         else{
-            //RESERVE에 INSERT 
-            $sql = "INSERT INTO RESERVE
-                    VALUES (:isbn, :cno, TO_DATE(:datetime, 'YY/MM/DD') + 1)";
+            //이미 대출 중인 도서인지 확인
+            $stmt = $conn -> prepare("SELECT CNO FROM EBOOK WHERE CNO = :cno");
+            $stmt -> execute(array($cno));
+            if($row = $stmt -> fetch(PDO::FETCH_ASSOC)){
+                //RESERVE에 INSERT 
+                $sql = "INSERT INTO RESERVE
+                        VALUES (:isbn, :cno, TO_DATE(:datetime, 'YY/MM/DD') + 1)";
+                $stmt = $conn -> prepare($sql);
+                $stmt -> execute(array($isbn, $cno, $datetime));     
+                echo "<script>alert('예약이 완료 되었습니다.'); history.back();</script>";
+            } else {
+                echo "<script>alert('이미 대출 중인 도서입니다. 연장 이용해주세요.'); history.back();</script>";
+            }
+            
+        }
+        
+    }else{
+        // 최초 예약인 경우 EBOOK에서 DATEDUE 다음 날로 예약 지정 
+        //이미 대출 중인 도서인지 확인
+        $stmt = $conn -> prepare("SELECT CNO FROM EBOOK WHERE CNO = :cno");
+        $stmt -> execute(array($cno));
+        if($row = $stmt -> fetch(PDO::FETCH_ASSOC)){
+            echo "<script>alert('이미 대출 중인 도서입니다. 연장 이용해주세요.'); history.back();</script>";
+        }else {
+
+            //EBOOK 에서 DATEDUE 추출
+            $sql = "SELECT DATEDUE FROM EBOOK WHERE ISBN = :isbn";
             $stmt = $conn -> prepare($sql);
-            $stmt -> execute(array($isbn, $cno, $datetime));     
+            $stmt -> execute(array($isbn));
+            $row = $stmt -> fetch(PDO::FETCH_ASSOC);
+            $datedue = $row['DATEDUE'];
+            
+            // 추출 된 DATEDUE 바탕으로 RESERVE에 INSERT
+            $sql = "INSERT INTO RESERVE
+                VALUES (:isbn, :cno, TO_DATE(:datedue, 'YY/MM/DD') + 1)";
+            $stmt = $conn -> prepare($sql);
+            $stmt -> execute(array($isbn, $cno, $datedue));
             echo "<script>alert('예약이 완료 되었습니다.'); history.back();</script>";
         }
-
-    }else{
-    // 최초 예약인 경우 EBOOK에서 DATEDUE 다음 날로 예약 지정 
-        //EBOOK 에서 DATEDUE 추출
-        $sql = "SELECT DATEDUE FROM EBOOK WHERE ISBN = :isbn";
-        $stmt = $conn -> prepare($sql);
-        $stmt -> execute(array($isbn));
-        $row = $stmt -> fetch(PDO::FETCH_ASSOC);
-        $datedue = $row['DATEDUE'];
-        
-        // 추출 된 DATEDUE 바탕으로 RESERVE에 INSERT
-        $sql = "INSERT INTO RESERVE
-                VALUES (:isbn, :cno, TO_DATE(:datedue, 'YY/MM/DD') + 1)";
-        $stmt = $conn -> prepare($sql);
-        $stmt -> execute(array($isbn, $cno, $datedue));
-        echo "<script>alert('예약이 완료 되었습니다.'); history.back();</script>";
     }
 ?>
 

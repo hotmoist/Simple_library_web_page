@@ -1,6 +1,7 @@
 <?php
     session_start();
     include "../db_conn.php";
+    //include "../auto_return.php";
 ?>
 
 <!DOCTYPE html>
@@ -23,8 +24,14 @@
         if(isset($_SESSION['name'])){
             echo "<p1>{$_SESSION['name']} 님 환영합니다.</p1>";
         ?>
+
         <a href="../logout.php"><input type="button" value="로그아웃" /></a>
         <?php
+            if($_SESSION['name'] == 'admin'){
+        ?>
+            <button onclick="location.href='admin_page.php'" title="정보 관리" name="admin">정보관리</button>
+        <?php
+            }
         }else{
         ?>
         <p>

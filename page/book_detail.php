@@ -62,7 +62,7 @@
             $stmt -> execute(array($title));
             if($row = $stmt -> fetch(PDO::FETCH_ASSOC)){
                 ?> 
-            <p>대출된 도서입니다.</p>
+            <p>대출된 도서입니다. 예약을 해주세요</p>
             <!-- 예약 기능 구현 -->
             <form nam="reserve_form" method="POST" action="../reserve.php">
             <input type='hidden' name= "isbn" value="<?=$row['ISBN']?>">
