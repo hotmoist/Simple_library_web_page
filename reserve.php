@@ -4,27 +4,32 @@
     $cno = $_SESSION['cno'];
     $isbn = $_POST['isbn'];
 
-    // reserve 에서 예약 순위 확인 
-    $sql = "SELECT COUNT(ISBN) COUNT FROM RESERVE WHERE ISBN = :isbn";
-    $stmt = $conn -> prepare($sql);
-    $stmt -> execute(array($isbn));
-    $row = $stmt -> fetch(PDO::FETCH_ASSOC);
-    $count = $row['COUNT'];
+    if(isset($_SESSION['cno']) == FALSE){
+        // 로그인 여부 확인
+        echo "<script>alert('로그인이 필요한 기능입니다.'); location.href='/page/login_page.php';</script>"; 
+    }else{
 
-    // 현재 cno의 예약 건수 확인, 3건인 경우 예약 max로 더이상 예약 불가 
-    $sql = "SELECT COUNT(CNO) COUNT FROM RESERVE WHERE CNO = :cno";
-    $stmt = $conn -> prepare($sql);
-    $stmt -> execute(array($cno));
-    $row = $stmt -> fetch(PDO::FETCH_ASSOC);
-    $c_count = $row['COUNT'];
-
-    if($c_count > 2){
-        echo "<script>alert('예약 횟수를 초과 하였습니다.'); history.back();</script>";
-    }else if($count > 0){
-
-    // 이미 예약된 경우가 존재하면 가장 마지막 예약 날짜에서 +10 추가 
-        // 가장 마지막 순번 날짜 추출
-        $sql = "SELECT ISBN, CNO, DATETIME, RANK
+        // reserve 에서 예약 순위 확인 
+        $sql = "SELECT COUNT(ISBN) COUNT FROM RESERVE WHERE ISBN = :isbn";
+        $stmt = $conn -> prepare($sql);
+        $stmt -> execute(array($isbn));
+        $row = $stmt -> fetch(PDO::FETCH_ASSOC);
+        $count = $row['COUNT'];
+        
+        // 현재 cno의 예약 건수 확인, 3건인 경우 예약 max로 더이상 예약 불가 
+        $sql = "SELECT COUNT(CNO) COUNT FROM RESERVE WHERE CNO = :cno";
+        $stmt = $conn -> prepare($sql);
+        $stmt -> execute(array($cno));
+        $row = $stmt -> fetch(PDO::FETCH_ASSOC);
+        $c_count = $row['COUNT'];
+        
+        if($c_count > 2){
+            echo "<script>alert('예약 횟수를 초과 하였습니다.'); history.back();</script>";
+        }else if($count > 0){
+            
+            // 이미 예약된 경우가 존재하면 가장 마지막 예약 날짜에서 +10 추가 
+            // 가장 마지막 순번 날짜 추출
+            $sql = "SELECT ISBN, CNO, DATETIME, RANK
                 FROM 
                     (SELECT ISBN, CNO, DATETIME, RANK() OVER(ORDER BY DATETIME) AS RANK
                     FROM RESERVE
@@ -42,21 +47,21 @@
         $stmt = $conn -> prepare($sql);
         $stmt -> execute(array($isbn, $cno));
         if($row = $stmt -> fetch(PDO::FETCH_ASSOC)){
-             echo "<script>alert('이미 예약 중인 도서입니다.'); history.back();</script>";
-         }
+            echo "<script>alert('이미 예약 중인 도서입니다.'); history.back();</script>";
+        }
         else{
             //이미 대출 중인 도서인지 확인
-            $stmt = $conn -> prepare("SELECT CNO FROM EBOOK WHERE CNO = :cno");
-            $stmt -> execute(array($cno));
+            $stmt = $conn -> prepare("SELECT CNO FROM EBOOK WHERE CNO = :cno AND ISBN = :isbn");
+            $stmt -> execute(array($cno, $isbn));
             if($row = $stmt -> fetch(PDO::FETCH_ASSOC)){
+                echo "<script>alert('이미 대출 중인 도서입니다. 연장 이용해주세요.'); history.back();</script>";
+            } else {
                 //RESERVE에 INSERT 
                 $sql = "INSERT INTO RESERVE
-                        VALUES (:isbn, :cno, TO_DATE(:datetime, 'YY/MM/DD') + 1)";
+                        VALUES (:isbn, :cno, TO_DATE(:datetime) + 10)";
                 $stmt = $conn -> prepare($sql);
                 $stmt -> execute(array($isbn, $cno, $datetime));     
                 echo "<script>alert('예약이 완료 되었습니다.'); history.back();</script>";
-            } else {
-                echo "<script>alert('이미 대출 중인 도서입니다. 연장 이용해주세요.'); history.back();</script>";
             }
             
         }
@@ -64,12 +69,12 @@
     }else{
         // 최초 예약인 경우 EBOOK에서 DATEDUE 다음 날로 예약 지정 
         //이미 대출 중인 도서인지 확인
-        $stmt = $conn -> prepare("SELECT CNO FROM EBOOK WHERE CNO = :cno");
-        $stmt -> execute(array($cno));
+        $stmt = $conn -> prepare("SELECT CNO FROM EBOOK WHERE CNO = :cno AND ISBN = :isbn");
+        $stmt -> execute(array($cno, $isbn));
         if($row = $stmt -> fetch(PDO::FETCH_ASSOC)){
             echo "<script>alert('이미 대출 중인 도서입니다. 연장 이용해주세요.'); history.back();</script>";
         }else {
-
+            
             //EBOOK 에서 DATEDUE 추출
             $sql = "SELECT DATEDUE FROM EBOOK WHERE ISBN = :isbn";
             $stmt = $conn -> prepare($sql);
@@ -79,11 +84,12 @@
             
             // 추출 된 DATEDUE 바탕으로 RESERVE에 INSERT
             $sql = "INSERT INTO RESERVE
-                VALUES (:isbn, :cno, TO_DATE(:datedue, 'YY/MM/DD') + 1)";
+                VALUES (:isbn, :cno, TO_DATE(:datedue) + 10)";
             $stmt = $conn -> prepare($sql);
             $stmt -> execute(array($isbn, $cno, $datedue));
             echo "<script>alert('예약이 완료 되었습니다.'); history.back();</script>";
         }
+    }
     }
 ?>
 

@@ -36,6 +36,7 @@
                     FROM EBOOK E, AUTHORS A
                     WHERE E.ISBN = A.ISBN
                     AND E.CNO = :cno
+                    AND E.DATEDUE IS NOT NULL
                     ");
                     $stmt -> execute(array($cno));
                     while($row = $stmt -> fetch(PDO::FETCH_ASSOC)){

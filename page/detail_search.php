@@ -58,6 +58,8 @@
                 </thead>
                 <tbody>
                     <?php
+                    // 검색 기능 쿼리 실행
+                    // And를 사용하여 검색을 수행. 검색 정보가 부족 할 시 alert 창 표현 
                     $stmt = $conn -> prepare("SELECT E.TITLE, A.AUTHOR, E.PUBLISHER, EXTRACT(YEAR FROM CAST (E.YEAR AS DATE)) AS YEAR  
                     FROM  EBOOK E, AUTHORS A
                     WHERE E.ISBN = A.ISBN

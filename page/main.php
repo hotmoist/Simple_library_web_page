@@ -1,7 +1,7 @@
 <?php
     session_start();
     include "../db_conn.php";
-    //include "../auto_return.php";
+    include "../auto_return.php";
 ?>
 
 <!DOCTYPE html>
@@ -21,6 +21,7 @@
     </head>
     <body>
         <?php
+        // 로그인 시 상단 상태 변환 구현
         if(isset($_SESSION['name'])){
             echo "<p1>{$_SESSION['name']} 님 환영합니다.</p1>";
         ?>
@@ -28,6 +29,7 @@
         <a href="../logout.php"><input type="button" value="로그아웃" /></a>
         <?php
             if($_SESSION['name'] == 'admin'){
+                // 관리자 계정 접속시
         ?>
             <button onclick="location.href='admin_page.php'" title="정보 관리" name="admin">정보관리</button>
         <?php
@@ -35,6 +37,7 @@
         }else{
         ?>
         <p>
+            로그인이 필요합니다.
             <button onclick="location.href='login_page.php'" title="LOGIN" name="login">LOGIN</button>
         </p>
         <?php
@@ -45,6 +48,7 @@
         </p>
         <hr>
         <p>
+        <!-- 상단 바 구현 -->
             <div id="lib_search_list">
                 <ul>
                     <li>

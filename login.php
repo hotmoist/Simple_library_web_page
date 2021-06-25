@@ -1,4 +1,5 @@
 <?php
+//로그인 기능
     session_start();
     include "db_conn.php";
     include "password.php";

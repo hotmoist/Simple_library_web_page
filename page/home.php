@@ -1,7 +1,7 @@
 <?php
     include "main.php";
 ?>
-
+<!-- 메인 페이지 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,6 +12,7 @@
 </head>
 <body>
 <p>
+<!--통합 검색 구현 -->
     <form name="home_total_search" action="total_search.php" method="POST">
         <h1>통합검색</h1>
             <br>

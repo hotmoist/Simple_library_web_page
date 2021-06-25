@@ -65,13 +65,13 @@
         </form>
         <!-- 기존 대출자가 반납 후 첫번째 순번으로 이메일 통보 받았을때 구현 -->
         <h3>대출 가능 도서</h3>
-        <form method="POST" action= "" name="available_loan_form">
+        <form method="POST" action= "..\loanable.php" name="available_loan_form">
         <table class="table table-bordered text-center">
             <thead>
                 <th>제목</th>
                 <th>저자</th>
                 <th>출판사</th>
-                <th>일자</th>
+                <th>대출 가능 기간</th>
             </thead>
             <tbody>
             <?php
@@ -84,17 +84,22 @@
                 $stmt -> execute(array($cno));
                 if($row = $stmt -> fetch(PDO::FETCH_ASSOC)){
                     // 기존 대출자가 반납하여서 예약에서 대출 가능한 도서가 존재하는 경우
+                    $deadline = explode("/", $row['DATERENTED']);
+                    $deadline = $deadline[0]."-".$deadline[1]."-".$deadline[2];
+                    $deadline = strtotime($deadline.'+1 days');
+                    $deadline = date('Y/m/d', $deadline);
                     ?>
-                    <td><input type ='radio' name ='isbn' value=<?=$row['ISBN']?>><?=$row['TITLE']?></td>
+                    <td><input type ='radio' name ='isbn' id='isbn' value=<?=$row['ISBN']?>><?=$row['TITLE']?></td>
                     <td><?=$row['AUTHOR']?></td>
                     <td><?=$row['PUBLISHER']?></td>
-                    <td><?=$row['DATERENTED']?></td>
+                    <td><?=$row['DATERENTED']?> ~ <?=$deadline?></td>
             </tbody>
         </table>
-        <P><button type="submit">대출하기</button></P>
-                    <?php
+        <P><button type="submit" >대출하기</button></P>
+            <?php
                 }else{
-                    ?>
+                    // 예약 가능한 도서가 존재하지 않는 경우 
+            ?>
                 </table>
                 <p>대출 가능한 도서가 없습니다.</p>
                 <?php

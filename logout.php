@@ -1,4 +1,5 @@
 <?php
+    // 로그 아웃 기능
 	//session_destroy();
     session_start();
     session_unset();

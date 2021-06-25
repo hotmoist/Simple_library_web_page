@@ -4,14 +4,18 @@
     $isbn = $_POST['isbn'];
     $cno = $_SESSION['cno'];
 
-    // 예약 여부 확인
-    // 해당 도서에 대해 예약 정보가 존재하는 경우 더이상 연장을 할 수 없다
-    $stmt = $conn -> prepare("SELECT COUNT(ISBN) COUNT 
+    if(isset($_SESSION['cno']) == FALSE){
+        // 로그인 여부 확인
+        echo "<script>alert('로그인이 필요한 기능입니다.'); location.href='/page/login_page.php';</script>"; 
+    }else{
+        // 예약 여부 확인
+        // 해당 도서에 대해 예약 정보가 존재하는 경우 더이상 연장을 할 수 없다
+        $stmt = $conn -> prepare("SELECT COUNT(ISBN) COUNT 
                               FROM RESERVE 
                               WHERE ISBN = :isbn");
     $stmt -> execute(array($isbn));
     $row = $stmt -> fetch(PDO::FETCH_ASSOC);
-
+    
     if($isbn == ""){
         echo "<script>alert('도서를 선택해주세요.'); history.back();</script>";
     }
@@ -24,7 +28,7 @@
         $stmt -> execute(array($isbn));
         $row = $stmt -> fetch(PDO::FETCH_ASSOC);
         $datedue = $row['DATEDUE'];
-
+        
         if($row['EXTTIMES'] == ''){
             $exttimes = 1;
         }else{
@@ -36,10 +40,11 @@
             echo "<script>alert('연장 횟수를 초과하였습니다.'); history.back();</script>";
         }else{
             $stmt = $conn -> prepare("UPDATE EBOOK 
-                                      SET DATEDUE = TO_DATE(:datedue, 'YY/MM/DD') + 10, EXTTIMES = :exttimes 
+                                      SET DATEDUE = TO_DATE(:datedue) + 10, EXTTIMES = :exttimes 
                                       WHERE ISBN = :isbn");
             $stmt -> execute(array($datedue, $exttimes, $isbn));
             echo "<script>alert('대출이 연장되었습니다.'); history.back();</script>";
         }
+    }
     }
 ?>

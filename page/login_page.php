@@ -2,7 +2,7 @@
     include "db_conn.php";
     include "main.php"
 ?>
-
+<!-- 로그인 페이지 -->
 <!DOCTYPE html>
 <html lang="ko">
     <head>
