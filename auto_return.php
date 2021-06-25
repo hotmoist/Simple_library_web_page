@@ -20,6 +20,7 @@
         $datedue = $row['DATEDUE'];
         $cno = $row['CNO'];
         $str_target = strtotime($datedue);
+        $dateRented = $row['DATERENTED'];
 
         if($str_now > $str_target){
             // 기간이 지났으므로 반납을 한다.
@@ -30,9 +31,10 @@
             $stmt -> execute(array($isbn));
 
             //반납 된 도서 정보 PREVIOUSRENTAL 테이블에 저장
+            // 무결성 제약 조건을 피하기 위해 시각 정보를 랜덤하게 지정하여 저장하게 한다. 
             $stmt = $conn -> prepare("INSERT INTO PREVIOUSRENTAL 
-            VALUES(:isbn, :daterented, SYSDATE, :cno)");
-            $stmt -> execute(array($isbn, $row['DATERENTED'], $cno));
+            VALUES(:isbn, TO_DATE(TO_CHAR((TRUNC(TO_DATE(:dateRented)) + (TRUNC(DBMS_RANDOM.value(0,1000))/1440)),'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss'), SYSDATE, :cno)");
+            $stmt -> execute(array($isbn, $dateRented, $cno));
 
             // 자동 반납 후 다음 순번자가 존재하면 이메일을 보낸다.
             $stmt = $conn -> prepare("SELECT COUNT(ISBN) COUNT
@@ -83,7 +85,9 @@
     WHERE DATEDUE IS NULL 
     AND DATERENTED IS NOT NULL"); 
     $stmt -> execute();
+
     while($row = $stmt -> fetch(PDO::FETCH_ASSOC)){
+        // Ebook 의 정보 추출
         $isbn = $row['ISBN'];
         $title = $row['TITLE'];
         $dateRented = $row['DATERENTED'];   // 대출 해야할 deadline 시각 정보 
@@ -92,17 +96,20 @@
 
         if($str_now > $str_target){
             // 기간이 지났으므로 반납을 한다.
+            // reserve 목록에서 제거
+            $stmt = $conn -> prepare("DELETE RESERVE
+            WHERE ISBN = :isbn AND CNO = :cno");
+            $stmt -> execute(array($isbn, $cno));
+
+            // ebook에서 정보 예약 없는 것으로 변경
             $stmt = $conn -> prepare("UPDATE EBOOK
             SET CNO = NULL , EXTTIMES = NULL, DATERENTED = NULL, DATEDUE= NULL
             WHERE ISBN = :isbn
             ");
             $stmt -> execute(array($isbn));
 
-             //반납 된 도서 정보 PREVIOUSRENTAL 테이블에 저장
-             $stmt = $conn -> prepare("INSERT INTO PREVIOUSRENTAL 
-             VALUES(:isbn, :daterented, SYSDATE, :cno)");
-             $stmt -> execute(array($isbn, $dateRented, $cno));
-
+             //반납 처리된 도서 정보는  PREVIOUSRENTAL 테이블에 저장 할 필요 없다. 대출이 안되었기 때문이다.
+ 
             // 자동 반납 후 다음 순번자가 존재하면 이메일을 보낸다.
             $stmt = $conn -> prepare("SELECT COUNT(ISBN) COUNT
                                 FROM RESERVE
@@ -144,5 +151,5 @@
                 include 'mail.php';
             }
         }
-    }
+    } 
 ?>
