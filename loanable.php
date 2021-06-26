@@ -27,7 +27,6 @@
         WHERE ISBN = :isbn
          ");
         $stmt -> execute(array($cno, $isbn));
-        print_r($stmt);
         echo "$isbn";
         echo "$cno";
         
