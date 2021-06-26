@@ -27,8 +27,7 @@
         WHERE ISBN = :isbn
          ");
         $stmt -> execute(array($cno, $isbn));
-        echo "$isbn";
-        echo "$cno";
+     
         
         // 예약 명단에 존재하는 경우 삭제 
         $stmt = $conn -> prepare("DELETE RESERVE
