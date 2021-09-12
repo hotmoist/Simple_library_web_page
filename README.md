@@ -3,7 +3,8 @@
 > CNU Data base course final term project
 
 ## Description
-Simple online library web page
+Simple online(localhost) library web page
+
 
 ## features
 will update later...
